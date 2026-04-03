@@ -71,7 +71,7 @@ void get_point(){
 	theta = Theta_m;
 }
 
-void move_to_point(double X_target, double Y_target, double Theta_Target, double Velocity, double Distance_error, double kp, double kd){
+void move_to_point(double X_target, double Y_target, double Theta_Target, double Velocity, double kp_dist, double kd_dist, double kp_turn, double kd_turn){
 	get_point();
 
 	double X_Error = X_target - x;
@@ -86,17 +86,27 @@ void move_to_point(double X_target, double Y_target, double Theta_Target, double
 		Distance = sqrt((x_error * x_error) + (y_error * y_error));
 
 		Theta_Target = atan2(Y_Error, X_Error);
-		double Theta_Error - Prev_Inertial_Rotation;
+		double Theta_Error - theta;
 
-		double X_Derivative = X_Prev_Error - X_Error;
-		double Y_Derivative = Y_Prev_Error - Y_Error;
-		double Theta_Derivative = Theta_Prev_Error - Theta_Error;
+		while (Theta_Error > numbers::pi) Theta_Error -= 2 * numbers::pi;
+		while (Theta_Error < numbers::pi) Theta_Error += 2 * numbers::pi;
 
-		double X_Output = (kp * X_Error) + (kd * X_Derivative);
-		double Y_Output = (kp * Y_Error) + (kd * Y_Derivative);
-		double Theta_Output = (kp * Theta_Error) + (kd * Theta_Derivative);
+		double Distance_Derivative = Distance -  Distance_Prev_Error;
+		double Theta_Derivative = Theta_Error - Theta_Prev_Error;
 
+		double Forward_Output = (kp_dist * Distance) + (kd_dist * Distance_Derivative);
+		double Turn_Output = (kp_dist * Theta_Error) + (kd_dist * Theta_Derivative);
+
+		double Left_velocity = Velocity + Forward_Output + Turn_Output;
+		double Right_Velocity = Velocity - Forward_Output - Turn_Output;
+
+		Left_Drive.move_velocity(Left_velocity);
+		Right_Drive.move_velocity(Right_velocity);
+
+		Distance_Prev_Error = Distance;
+		Theta_Prev_Error = Theta_Error;
 		
+		pros::delay(20);
 	}
 }
 
