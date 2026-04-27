@@ -122,30 +122,34 @@ void P_straight_timeout(double heading, double distance, double velocity, double
 void P_auton_strat(){
     float kp = 2.2;
     float turn_speed = 60;
-   while (true){
+  while (true){
         if (FingerSensor.pressing()){
         FingerSensor.setColor(blue);
         Solenoid1.retract(cylinder1);
         //First long drive forward to red pin
-        P_straight(0, 1065, 80, kp);
+        P_straight(0, 1075, 80, kp);
         wait(0.1, timeUnits::sec);
-        turn_correct(90, turn_speed, 30);
+        //Turns to first red pin
+        turn_correct(90, turn_speed, 32);
         wait(0.1, timeUnits::sec);
         Solenoid1.extend(cylinder1);
         Solenoid1.pumpOn();
-        P_straight(90, 310, 80, kp);
+        //Drives to first red pin from turn
+        P_straight(90, 290, 80, kp);
         //Gets red pin
         Solenoid1.retract(cylinder1);
         wait(0.1, timeUnits::sec);
         GripperArms.spinFor(forward, 200, rotationUnits::deg);
         wait(0.1, timeUnits::sec);
         //Gets first orange pin alingments
-        P_straight(90, 300, 80, kp);
+        P_straight(90, 280, 80, kp);
         //Turns to get second orange pin
         turn_correct(115, turn_speed, 30);
+        wait(0.1, timeUnits::sec);
+        P_straight(115, 337, 70, kp);
         //Slams down orange pins
         wait(0.1, timeUnits::sec);
-        GripperArms.spinFor(reverse, 200, rotationUnits::deg);
+        GripperArms.spinFor(reverse, 200, rotationUnits::deg, true);
         wait(0.2, timeUnits::sec);
         Solenoid1.extend(cylinder1);
         wait(0.1, timeUnits::sec);
@@ -153,7 +157,7 @@ void P_auton_strat(){
         //Double stack shift in grippers
         P_straight(115, 75, 80, kp);
         wait(0.1, timeUnits::sec);
-        P_straight(115, 250, -80, kp);
+        P_straight(115, 235, -80, kp);
         wait(0.1, timeUnits::sec);
         //Turns toward beam
         turn_correct(180, turn_speed, 30);
@@ -169,7 +173,7 @@ void P_auton_strat(){
         P_straight(180, 135, 80, kp);
         Solenoid1.pumpOff();
         wait(0.1, timeUnits::sec);
-        //Inserts 2 double stacks into beam
+        //Inserts double stacks into beam
         GripperArms.spinFor(forward, 710, rotationUnits::deg);
         Solenoid1.extend(cylinder1);
         GripperArms.spinFor(reverse, 710, rotationUnits::deg);
@@ -180,21 +184,24 @@ void P_auton_strat(){
         wait(0.1, timeUnits::sec);
         P_straight(220, 300, 80, kp);
         //Turns to standoff pin
-        
         Solenoid1.pumpOn();
+        //Grabs stanoff pin
         Solenoid1.retract(cylinder1);
         wait(0.3, timeUnits::sec);
+        //Raises arm so the white pins don't hit
         GripperArms.spinFor(forward, 280, rotationUnits::deg);
         wait(0.1, timeUnits::sec);
-        P_straight(220, 337, -80, kp);
+        //Backs up from standoff pin position
+        P_straight(220, 350, -50, kp);
         wait(0.1, timeUnits::sec);
         //Turn toward pedestal to place pin
-        turn_correct(192, turn_speed, 15);
+        turn_correct(193, turn_speed, 15);
         wait(0.1, timeUnits::sec);
         //Drives into pedestal to place pin
-        P_straight_timeout(192, 380, 50, kp, 1.5);
+        P_straight_timeout(192, 380, 52, kp, 1.5);
         Solenoid1.extend(cylinder1);
-        P_straight(198, 225, -80, kp);
+        //Drives away from placed standoff pin
+        P_straight(197, 210, -80, kp);
         wait(0.1, timeUnits::sec);
         GripperArms.spinFor(reverse, 280, rotationUnits::deg);
         wait(0.1, timeUnits::sec);
@@ -215,70 +222,107 @@ void P_auton_strat(){
         //Drive away from placed beam
         P_straight(0, 400, 60, kp);
         Beamlift.spinFor(reverse, 490, rotationUnits::deg);
-        turn_correct(90, turn_speed, 30);
+        //Turns into first orange pin for wall zero
+        turn_correct(90, turn_speed, 33);
         wait(0.1, timeUnits::sec);
-        P_straight(90, 400, 80, kp);
+        //Drives to first orange pin for wall zero
+        P_straight(90, 400, 55, kp);
         wait(0.1, timeUnits::sec);
-        turn_correct(110, turn_speed, 10);
+        //Turn to second orange pin
+        turn_correct(111, turn_speed, 10);
         wait(0.1, timeUnits::sec);
-        P_straight_timeout(110, 650, 70, kp, 2.5);
+        //Drives Certain distance to get pins
+        P_straight_timeout(110, 480, 55, kp, 2);
+        wait(0.1, timeUnits::sec);
+        //Turns to zero on wall
+        turn_correct(90, turn_speed, 20);
+        //Zeros the robot on the wall
+        P_straight_timeout(90, 200, 70, kp, 0.8);
         Solenoid1.retract(cylinder1);
-        P_straight(90, 80, -70, kp);
+        //Slight correction of zero on wall
+        turn_correct(90, turn_speed, 15);
+        //Backup from wall
+        P_straight(90, 40, -70, kp);
         wait(0.1, timeUnits::sec);
-        turn_correct(200, turn_speed, 30);
-        GripperArms.spinFor(reverse, 200, rotationUnits::deg, false);
+        //Turns into stacking
+        turn_correct(202, turn_speed, 30);
+        GripperArms.spinFor(reverse, 200, rotationUnits::deg);
+        //Drive into two pins and stack
+        P_straight(202, 550, 70, kp);
+        GripperArms.setVelocity(85, percentUnits::pct);
+        GripperArms.spinFor(reverse, 200, rotationUnits::deg, true);
         Solenoid1.pumpOn();
+        GripperArms.setVelocity(100, percentUnits::pct);
         wait(0.2, timeUnits::sec);
         Solenoid1.extend(cylinder1);
         wait(0.2, timeUnits::sec);
         Solenoid1.retract(cylinder1);
-        P_straight(200, 75, 70, kp);
+        //Align the two double stacks into grippers
+        P_straight(202, 75, 70, kp);
         wait(0.1, timeUnits::sec);
-        P_straight(200, 80, -70, kp);
-        turn_correct(280, turn_speed, 25);
+        //Backup into beam to align it with the wall
+        P_straight(202, 130, -70, kp);
+        //Turn into aligned beam to clamp
+        turn_correct(280, turn_speed, 22);
         wait(0.1, timeUnits::sec);
         Solenoid1.pumpOff();
+        //Drive into aligned beam to clamp
         L.spin(reverse);
         R.spin(reverse);
-        wait(1.1, timeUnits::sec);
+        wait(1.3, timeUnits::sec);
+        //Clamp beam
         Solenoid1.extend(cylinder2);
-        P_straight(270, 225, 70, kp);
+        //Drive away to get off of loading zone from original beam position
+        P_straight(270, 235, 70, kp);
+        //Put 2 double stacks into beam
         GripperArms.spinFor(forward, 710, rotationUnits::deg);
         wait(0.1, timeUnits::sec);
         Solenoid1.extend(cylinder1);
         wait(0.1, timeUnits::sec);
         GripperArms.spinFor(reverse, 710, rotationUnits::deg);
-        turn_correct(180, turn_speed, 21);
+        Beamlift.spinFor(forward, 35, rotationUnits::deg);
+        //Turn into first orange pin for final double stack
+        turn_correct(180, turn_speed, 44);
         wait(0.1, timeUnits::sec);
-        P_straight(180, 240, 70, kp);
+        //Drive into first orange pin for final double stack
+        P_straight(180, 265, 70, kp);
         wait(0.1, timeUnits::sec);
+        //Grab first orange pin for final double stack
         Solenoid1.retract(cylinder1);
         wait(0.1, timeUnits::sec);
+        //Lift gripper arms for final double stack
         GripperArms.spinFor(forward, 200, rotationUnits::deg);
         wait(0.1, timeUnits::sec);
-        P_straight(180, 190, 70, kp);
+        //Drive into second blue pin final double stack
+        P_straight(180, 135, 70, kp);
         wait(0.1, timeUnits::sec);
-        GripperArms.spinFor(reverse, 200, rotationUnits::deg, false);
+        //Stack final double stack 
+        GripperArms.spinFor(reverse, 200, rotationUnits::deg, true);
         Solenoid1.pumpOn();
         wait(0.2, timeUnits::sec);
         Solenoid1.extend(cylinder1);
         wait(0.2, timeUnits::sec);
-        P_straight(180, 120, -70, kp);
+        //Drive a little bit away from final doble stack
+        P_straight(180, 70, -70, kp);
         wait(0.1, timeUnits::sec);
-        Beamlift.spinFor(forward, 40, rotationUnits::deg, false);
-        turn_correct(345, turn_speed, 25);
-        Beamlift.spinFor(forward, 285, rotationUnits::deg, false);
+        //Turn into stack final cactus
+        turn_correct(345, turn_speed, 39);
+        Beamlift.spinFor(forward, 300, rotationUnits::deg, true);
         wait(0.8, timeUnits::sec);
         Solenoid2.extend(cylinder1);
         wait(0.3, timeUnits::sec);
+        //Drive into stack for final cactus
         P_straight_timeout(345, 325, -38, 1.5, 1.5);
         wait(0.1, timeUnits::sec);
-        Beamlift.spinFor(reverse, 50, rotationUnits::deg);
+        //Stack final cactus
+        Beamlift.spinFor(reverse, 55, rotationUnits::deg);
         Solenoid1.retract(cylinder2);
         wait(0.6, timeUnits::sec);
         Solenoid1.pumpOff();
-        Beamlift.spinFor(forward, 50, rotationUnits::deg);
-        P_straight(340, 800, 100, kp);
+        Beamlift.spinFor(forward, 55, rotationUnits::deg);
+        //Drive into touch 2 final pins
+        P_straight(340, 935, 100, kp);
+        //Grab 2 final pins
         Solenoid1.retract(cylinder1);
         Brain.programStop();
         }
@@ -286,6 +330,7 @@ void P_auton_strat(){
     }
     return;
 }
+
 
 int main() {
 //Only calling 2 functions because the other functions are called in the strategy functions
