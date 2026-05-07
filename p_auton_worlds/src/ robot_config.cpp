@@ -22,10 +22,6 @@ pneumatic Solenoid1 = pneumatic(PORT12);
 // Solenoid for floor cactus aligner
 extern pneumatic Solenoid2 = pneumatic(PORT11);
 
-// Gyro Sensors
-gyro Gyro9 = gyro(PORT9);
-gyro Gyro10 = gyro(PORT10);
-
 //Brain Inertial/Sensor
 inertial BrainInertial = inertial(BrainInertial);
 
