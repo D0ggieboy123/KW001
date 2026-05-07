@@ -20,7 +20,7 @@ motor_group Beamlift = motor_group(LBeamlift, RBeamlift);
 pneumatic Solenoid1 = pneumatic(PORT12);
 
 // Solenoid for floor cactus aligner
-extern pneumatic Solenoid2 = pneumatic(PORT11);
+pneumatic Solenoid2 = pneumatic(PORT11);
 
 //Brain Inertial/Sensor
 inertial BrainInertial = inertial(BrainInertial);
