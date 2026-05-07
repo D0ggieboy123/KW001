@@ -36,7 +36,7 @@ double Theta_Prev_Error = 0.0;
 
 void Settings(){
 	Left_Drive.set_drive_brake(brake_type: MOTOR_BRAKE_COAST);
-	Right_Drive.set_drive_brake(brake_type : MOTOR_BRAKE_COAST);
+	Right_Drive.set_drive_brake(brake_type: MOTOR_BRAKE_COAST);
 }
 
 //Calculates current position on field 
